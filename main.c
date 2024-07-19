@@ -143,6 +143,7 @@ int main() {
                 }
                 if(IsKeyPressed(KEY_ESCAPE)){
                     state = MENU;
+                    ind_menu = 0;
                     pause = true;
                 }
 
@@ -178,7 +179,8 @@ int main() {
                 DrawRectangleRec(player, GREEN);
                 for(int i = 0; i < 5; i++){
                     if(CheckCollisionRecs(obstacles[i], player)) {
-                        state = DEATH; 
+                        state = DEATH;
+                        pause = false;
                         ind_menu = 0;
                     }
                     DrawRectangleRec(obstacles[i], BLACK);
