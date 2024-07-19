@@ -5,10 +5,10 @@
 #define Width 800
 #define Height 600
 
-#define CENTER(a) (Width / 2) - (a / 2) 
+#define CENTER(WH, a) (WH / 2) - (a / 2) 
 #define MIN(a, b) (a < b) ? a : b
 
-typedef enum { MENU = 0, GAME, CONTINUE,QUIT } GameScreen;
+typedef enum { MENU = 0, GAME, CONTINUE, QUIT, DEATH } GameScreen;
 
 typedef struct {
     int vel_o;
@@ -63,12 +63,13 @@ int main() {
     bool run = 1;
     int ind_menu = 0;
     bool mouse_cntrl = true;
+    int frame_counter = 0;
 
     while (!WindowShouldClose() && run) {
         BeginDrawing();
-        ClearBackground(RAYWHITE);
         switch (state) {
             case MENU: {
+                ClearBackground(RAYWHITE);
                 Rectangle texts[3];
                 char *text[3] = {"New Game", "Continue", "Quit"};
                 int ys = 200;
@@ -77,8 +78,8 @@ int main() {
                     int text_size = MeasureText(text[i], 40);
                     if(i == 1 && !pause) 
                         color = LIGHTGRAY;
-                    DrawText(text[i], CENTER(text_size), ys, 40, color);
-                    texts[i].x = CENTER(text_size) - 10;
+                    DrawText(text[i], CENTER(Width, text_size), ys, 40, color);
+                    texts[i].x = CENTER(Width, text_size) - 10;
                     texts[i].y = ys - 10;
                     texts[i].width = text_size + 20;
                     texts[i].height = 60;
@@ -124,6 +125,7 @@ int main() {
                 state = CONTINUE; 
             } break;
             case CONTINUE: {
+                ClearBackground(RAYWHITE);
                 if(player.x < (double) Width / 5) 
                     p_vel.x = 400;
                 else p_vel.x = 0;
@@ -176,10 +178,21 @@ int main() {
                 DrawRectangleRec(player, GREEN);
                 for(int i = 0; i < 5; i++){
                     if(CheckCollisionRecs(obstacles[i], player)) {
-                        state = MENU; 
+                        state = DEATH; 
                         ind_menu = 0;
                     }
                     DrawRectangleRec(obstacles[i], BLACK);
+                }
+            } break;
+            case DEATH: {
+                int y = CENTER(Height, 100);
+                DrawRectangle(0, y, Width, 80, BLACK);
+                int text_size = MeasureText("YOU DIED", 40);
+                DrawText("YOU DIED", CENTER(Width, text_size), y + 20, 40, RED);
+                frame_counter++;
+                if(frame_counter > 90) {
+                    frame_counter = 0;
+                    state = MENU;
                 }
             } break;
             case QUIT: {
